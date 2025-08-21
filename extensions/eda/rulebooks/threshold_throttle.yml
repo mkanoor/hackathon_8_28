@@ -17,8 +17,8 @@
         shutdown_delay: 60
 
   rules:
-    - name: r1
-      condition: event.level == 'error'
+    - name: Threshold rule
+      condition: event.level == 'error' or event.level == 'warning'
       throttle:
           accumulate_within: 1 minutes
           threshold: 10
