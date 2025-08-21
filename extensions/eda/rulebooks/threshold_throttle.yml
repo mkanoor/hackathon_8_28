@@ -31,3 +31,4 @@
           organization: "{{ organization_name | default('Default') }}"
           labels:
             - "{{ my_label | default('Activated by user') }}"
+            - "{{ event.name ~ '-' ~ event.level ~ '-' ~ event.index }}"
