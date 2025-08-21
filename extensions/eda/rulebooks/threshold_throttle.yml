@@ -1,0 +1,33 @@
+---
+- name: Threshold throttle
+  hosts: localhost
+  sources:
+    - name: Test Threshold
+      ansible.eda.generic:
+        payload:
+          - name: alert1
+            level: error
+            code: 205
+          - name: alert2
+            level: warning
+            code: 207
+        event_delay: 1
+        loop_count: 20
+        create_index: index
+        shutdown_delay: 60
+
+  rules:
+    - name: r1
+      condition: event.level == 'error'
+      throttle:
+          accumulate_within: 1 minutes
+          threshold: 10
+          group_by_attributes:
+             - event.level
+             - event.code
+      action:
+        run_job_template:
+          name: "{{ job_template_name | default('Demo Job Template') }}"
+          organization: "{{ organization_name | default('Default') }}"
+          labels:
+            - "{{ my_label | default('Activated by user') }}"
