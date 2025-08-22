@@ -21,7 +21,7 @@
         shutdown_after: 60
         create_index: index
   rules:
-    - name: "Run job template"
+    - name: "Locked example"
       condition: event.error >= 303
       action:
         run_job_template:
