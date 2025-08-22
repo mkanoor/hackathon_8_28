@@ -1,0 +1,36 @@
+---
+- name: Test run job templates with lock
+  hosts: all
+  execution_strategy: parallel
+  sources:
+    - ansible.eda.generic:
+        payload:
+           - name: "{{ datacenter1 | default('Demo Job Template') }}"
+             error: 678
+             sleep: 30
+             lock: "{{ lock1 | default('datacenter1') }}"
+           - name: "{{ datacenter2 | default('Demo Job Template') }}"
+             error: 303
+             sleep: 20
+             lock: "{{ lock2 | default('datacenter2') }}"
+           - name: "{{ datacenter3 | default('Demo Job Template') }}"
+             error: 353
+             sleep: 10
+             lock: "{{ lock3 | default('datacenter3') }}"
+        loop_count: 3   
+        shutdown_after: 60
+        create_index: index
+  rules:
+    - name: "Run job template"
+      condition: event.error >= 303
+      action:
+        run_job_template:
+          name: "{{ event.name }}"
+          organization: "{{ organization | default('Default') }}"
+          job_args:
+            extra_vars:
+              hello: Fred
+              sleep_interval: "{{ event.sleep }}"
+          lock: "{{ event.lock }}"
+          labels:
+            - "{{ event.lock }}"
